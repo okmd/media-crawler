@@ -1,8 +1,8 @@
-from genericpath import exists
 import pickle
 import os
 import pathlib
 from ..crawler import settings
+from threading import Lock
 
 class File2:
     def __init__(self, name):
@@ -34,6 +34,7 @@ class File:
     '''Structure: {link1:{porb1:val1, prop2:val2}, Link2:{..}..}'''
     
     def __init__(self, name):
+        self._lock = Lock()
         self.save_link_filename = name
         self.read_content()
         self.get_size()
@@ -46,17 +47,19 @@ class File:
         # create a file only if not exist.
         pathlib.Path(self.save_link_filename).touch(exist_ok=True)
         # reading empty file
-        if not os.path.getsize(self.save_link_filename):
-            self.content = {}
-        else:
-            with open(self.save_link_filename, 'rb') as f:
-                self.content = pickle.load(f)
-        return self.content
+        with self._lock:
+            if not os.path.getsize(self.save_link_filename):
+                self.content = {}
+            else:
+                with open(self.save_link_filename, 'rb') as f:
+                    self.content = pickle.load(f)
+            return self.content
     
     def write_content(self, content):
-        with open(self.save_link_filename, 'wb+') as f:
-            pickle.dump(content, f)
-            self.content = content
+        with self._lock:
+            with open(self.save_link_filename, 'wb+') as f:
+                pickle.dump(content, f)
+                self.content = content
                           
     def __get_content(self, key, value):
         query_content_count = 0
@@ -65,7 +68,7 @@ class File:
             if self.content[content_key].get(key, None) == value:
                 query_content_count += 1
                 query_content[content_key] = self.content[content_key]
-                print(f"{content_key} : {content_value}.")
+                print(f"{content_value}:{content_key}.")
         print(f"Total count where {key} = {value} is {query_content_count}.")
         return query_content
             

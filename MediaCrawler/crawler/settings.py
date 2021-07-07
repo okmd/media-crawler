@@ -6,9 +6,11 @@ DEBUG = False
 ROOT_LOCATION = os.path.join(os.getcwd(), "media")
 # Maximum threads to use
 # NOTE: Not sure working or not
-MAX_THREADS = 11
+MAX_THREADS = 2
+# time to sleep between two requests in seconds
+SLEEP_TIME = 2
 # Minutes to only get links from the main websites
-CRAWL_TIME_MINUTE = 5 # -1 for no limit
+CRAWL_TIME_MINUTE = 1 # -1 for no limit
 
 # add all type of file extensions you think is a valid file but not a web page in website you are scraping.
 ALL_RESOURCE_TYPE = ['jpg', 'jpeg', 'mp3', 'mp4', 'wma', 'png', '3gp']
